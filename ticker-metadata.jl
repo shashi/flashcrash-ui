@@ -1,17 +1,17 @@
 using HDF5, JLD
 
-metadata = load(joinpath(pwd(), "xdata/classifications.jld"))
+const metadata = load(joinpath(pwd(), "xdata/classifications.jld"))
 
 flip(x) = (x[2], x[1])
 function reverse_idx(vec)
     map(flip, collect(enumerate(vec))) |> Dict
 end
 
-categories = metadata["categories"]
-category_idx = reverse_idx(categories)
-tickers = metadata["tickers"]
-ticker_idx = reverse_idx(tickers)
-matrix = metadata["matrix"]
+const categories = metadata["categories"]
+const category_idx = reverse_idx(categories)
+const tickers = metadata["tickers"]
+const ticker_idx = reverse_idx(tickers)
+const matrix = metadata["matrix"]
 
 function gettickers(categories)
     cats = matrix[:, map(c -> category_idx[c], categories)]
