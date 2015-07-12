@@ -18,12 +18,15 @@ function ticker_list(selected, filter_categories, startstr, current_ticker)
     map(list) do t
         item = (t == selected ? fillcolor("#9ba", pad(0.5em, t)) : pad(0.5em, t))
         constant(t, clickable(item)) >>> current_ticker
-    end |> vbox |> clip(auto) |> size(10em, 20em) 
+    end |> vbox |> clip(auto) |> size(10em, 22em) 
 end
+
+category_item(c, selection_stream, selected) =
+   hbox(pairwith(c, checkbox(c in selected)) >>> selection_stream, hskip(1em), c)
 
 function category_list(selection_stream, selected)
     map(categories) do c
-        hbox(pairwith(c, checkbox(c in selected)) >>> selection_stream, hskip(2em), c) |> pad(0.5em)
+        category_item(c, selection_stream, selected) |> pad(0.5em)
     end |> vbox |> clip(auto) |> size(20em, 25em) 
 end
 
@@ -43,12 +46,26 @@ function input_pane(window)
 
     current_date = Input(start_date)
     current_ticker = Input("A")
-    search_string = Input("")
+    search_string = Input("A")
     selection_stream = Input{Any}((nothing, nothing))
     selected_categories = foldl(update_selection, Set(String[]), selection_stream)
 
-    hbox(
-        datepicker(start_date, range=date_range) >>> current_date,
+    ticker_symbol = hbox(
+        lift(current_ticker, selected_categories) do t, sel
+            cat_suggestions = intersperse(hskip(1em), map(c -> category_item(c, selection_stream, sel), getcategories(t)))
+            vbox(
+                title(3, t),
+                hbox("Filter related stocks", hskip(1em), cat_suggestions...)
+            )
+        end
+    )
+
+    input_ui = hbox(
+        vbox(
+            ticker_symbol,
+            vskip(1em),
+            datepicker(start_date, range=date_range) >>> current_date,
+        ),
         hskip(1em),
         vbox(
             textinput(label="Search", floatinglabel=false) >>> search_string,
@@ -58,4 +75,5 @@ function input_pane(window)
          hskip(1em),
          lift(cs -> category_list(selection_stream, cs), selected_categories)
     )
+    current_ticker, current_date, input_ui
 end
