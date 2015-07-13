@@ -1,4 +1,4 @@
-const datadir = joinpath(pwd(), "xdata", "splitup")
+const datadir = joinpath(dirname(@__FILE__), "xdata", "splitup")
 const gpx = Gadfly.px
 function output_pane(ticker, date)
 
@@ -50,10 +50,10 @@ function output_pane(ticker, date)
             pad(1em, "Volume time series data is not available")
         end
 
-    returns = 
-        try 
+    returns =
+        try
             returns = jldopen(joinpath(dir, "derived.jld")) do f read(f, "returns") end
-            vbox(h2("Returns"), 
+            vbox(h2("Returns"),
                 drawing(PNG(1100gpx, 400gpx), plot(returns,
                     x=:time, y=:returns, Geom.line, Geom.point,
                     Guide.xlabel("Time"), Guide.ylabel("Realized volatility"),
@@ -64,10 +64,10 @@ function output_pane(ticker, date)
             pad(1em, "Returns data is not available")
         end
 
-    volatility = 
-        try 
+    volatility =
+        try
             rv = jldopen(joinpath(dir, "derived.jld")) do f read(f, "rv") end
-            vbox(h2("Realized volatility"), 
+            vbox(h2("Realized volatility"),
                 drawing(PNG(1100gpx, 400gpx), plot(rv,
                     x=:time, y=:rv , Geom.line, Geom.point,
                     Guide.xlabel("Time"), Guide.ylabel("Realized volatility"),

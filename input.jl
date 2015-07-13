@@ -6,7 +6,7 @@ const date_range = Date("2014-02-02"):Date("2014-02-05")
 # Input signals
 
 if !isdefined(Main, :_metadata_loaded)
-    include(joinpath(pwd(), "ticker-metadata.jl"))
+    include(joinpath(dirname(@__FILE__), "ticker-metadata.jl"))
     const _metadata_loaded = true
 end
 
@@ -49,6 +49,7 @@ function input_pane(window)
     search_string = Input("A")
     selection_stream = Input{Any}((nothing, nothing))
     selected_categories = foldl(update_selection, Set(String[]), selection_stream)
+
 
     ticker_symbol = hbox(
         lift(current_ticker, selected_categories) do t, sel

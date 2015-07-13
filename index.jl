@@ -1,15 +1,15 @@
-VERSION < v"0.4.0" && using Dates
+VERSION < v"0.4-" && using Dates
 using Compat
 using DataFrames
 using Distributions
 using Gadfly
 using BigFinance
 
-include(joinpath(pwd(), "input.jl"))
-include(joinpath(pwd(), "output.jl"))
+thisdir=dirname(@__FILE__)
+include(joinpath(thisdir, "input.jl"))
+include(joinpath(thisdir, "output.jl"))
 
 function main(window)
-
     current_ticker, current_date, input_ui = input_pane(window)
     vbox(
         h1("Julia Trade Data Viewer") |> fontweight(300),

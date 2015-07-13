@@ -1,6 +1,6 @@
 using HDF5, JLD
 
-const metadata = load(joinpath(pwd(), "xdata/classifications.jld"))
+const metadata = load(joinpath(dirname(@__FILE__), "xdata", "classifications.jld"))
 
 flip(x) = (x[2], x[1])
 function reverse_idx(vec)
