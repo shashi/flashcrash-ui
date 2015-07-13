@@ -1,4 +1,5 @@
-using Dates
+VERSION < v"0.4.0" && using Dates
+using Compat
 using DataFrames
 using Distributions
 using Gadfly
