@@ -4,6 +4,7 @@ using DataFrames
 using Distributions
 using Gadfly
 using BigFinance
+import Compose.mm
 
 thisdir=dirname(@__FILE__)
 include(joinpath(thisdir, "input.jl"))
