@@ -60,9 +60,11 @@ function output_pane(ticker, date)
         returns, returnsidx2pricesidx=ret(tpv)
         is, Gs, Gth = gesd(returns[:returns], 20, 1e-10)
         thisprice=map(i->tpv[:price][returnsidx2pricesidx[i]], is)
+        thisvol=map(i->tpv[:vol][returnsidx2pricesidx[i]], is)
         ret_gesd = DataFrame(time=returns[:time][is], G=Gs,
             returns=returns[:returns][is],
             price=thisprice,
+            vol=thisvol,
             pctchange=map(t->pchange(tpv, t), returns[:time][is])
         )
     end
@@ -96,70 +98,81 @@ function output_pane(ticker, date)
     #Plot graphs
 
     price = try
-            layers = Any[
-                layer(tpv, x=:time, y=:price, Geom.line, Geom.point,
-                    Theme(default_point_size=0.2mm, default_color=color("black"),
-                        line_width=0.05mm, highlight_width=0mm)),
-            ]
-            if ret_gesd!=nothing && size(ret_gesd, 1) > 0
-                l = layer(ret_gesd, x=:time, y=:price, Geom.point,
-                        Theme(default_point_size=0.7mm, default_color=color("red")))
-                push!(layers, l)
-            end
-
-            vbox(h2("Price"),
-                drawing(PNG(1100gpx, 400gpx), plot(
-                    Guide.xlabel("Time"), Guide.ylabel("Price"), layers...
-            )))
-        catch e
-            warn("Could not render price data")
-            warn(e)
-            Base.show_backtrace(STDERR, catch_backtrace())
-            pad(1em, "Price time series data is not available")
+        layers = Any[
+            layer(tpv, x=:time, y=:price, Geom.line, Geom.point,
+                Theme(default_point_size=0.2mm, default_color=color("black"),
+                    line_width=0.05mm, highlight_width=0mm)),
+        ]
+        if ret_gesd!=nothing && size(ret_gesd, 1) > 0
+            l = layer(ret_gesd, x=:time, y=:price, Geom.point,
+                    Theme(default_point_size=0.7mm, default_color=color("red")))
+            push!(layers, l)
         end
+
+        vbox(h2("Price"),
+            drawing(PNG(1100gpx, 400gpx), plot(
+                Guide.xlabel("Time"), Guide.ylabel("Price"), layers...
+        )))
+    catch e
+        warn("Could not render price data")
+        warn(e)
+        Base.show_backtrace(STDERR, catch_backtrace())
+        pad(1em, "Price time series data is not available")
+    end
 
     volume = try
-            vbox(h2("Volume"),
-                drawing(PNG(1100gpx, 400gpx), plot(tpv,
-                x=:time, y=:vol, Geom.line, Geom.point,
-                Guide.xlabel("Time"), Guide.ylabel("Tick volume"),
+        layers = Any[
+            layer(tpv, x=:time, y=:vol, Geom.line, Geom.point,
                 Theme(default_point_size=0.2mm, default_color=color("black"),
-                line_width=0.05mm, highlight_width=0gpx)
-            )))
-        catch e
-            warn("Could not render volume data")
-            warn(e)
-            Base.show_backtrace(STDERR, catch_backtrace())
-            pad(1em, "Volume time series data is not available")
+                    line_width=0.05mm, highlight_width=0gpx)
+            )
+        ]
+
+        if ret_gesd!=nothing && size(ret_gesd, 1) > 0
+            l = layer(ret_gesd, x=:time, y=:vol, Geom.point,
+                Theme(default_point_size=0.7mm, default_color=color("red")))
+            push!(layers, l)
         end
+
+        vbox(h2("Volume"),
+            drawing(PNG(1100gpx, 400gpx), plot(
+            Guide.xlabel("Time"), Guide.ylabel("Tick volume"),
+            layers...)))
+
+    catch e
+        warn("Could not render volume data")
+        warn(e)
+        Base.show_backtrace(STDERR, catch_backtrace())
+        pad(1em, "Volume time series data is not available")
+    end
 
     returns = try
-            layers = Any[]
+        layers = Any[]
 
-            if returns!=nothing
-                push!(layers,
-                layer(returns, x=:time, y=:returns, Geom.line, Geom.point,
-                    Theme(default_point_size=0.2mm, default_color=color("black"),
-                    line_width=0.05mm, highlight_width=0gpx)))
-            end
-
-            if ret_gesd!=nothing && size(ret_gesd, 1) > 0
-                l = layer(ret_gesd, x=:time, y=:returns, Geom.point,
-                        Theme(default_point_size=0.7mm, default_color=color("red")))
-                push!(layers, l)
-            end
-
-            vbox(h2("Returns"),
-                drawing(PNG(1100gpx, 400gpx), plot(
-                    Guide.xlabel("Time"), Guide.ylabel("Returns"),
-                    layers...
-                )))
-        catch e
-            warn("Could not render returns data")
-            warn(e)
-            Base.show_backtrace(STDERR, catch_backtrace())
-            pad(1em, "Returns data is not available")
+        if returns!=nothing
+            push!(layers,
+            layer(returns, x=:time, y=:returns, Geom.line, Geom.point,
+                Theme(default_point_size=0.2mm, default_color=color("black"),
+                line_width=0.05mm, highlight_width=0gpx)))
         end
+
+        if ret_gesd!=nothing && size(ret_gesd, 1) > 0
+            l = layer(ret_gesd, x=:time, y=:returns, Geom.point,
+                    Theme(default_point_size=0.7mm, default_color=color("red")))
+            push!(layers, l)
+        end
+
+        vbox(h2("Returns"),
+            drawing(PNG(1100gpx, 400gpx), plot(
+                Guide.xlabel("Time"), Guide.ylabel("Returns"),
+                layers...
+            )))
+    catch e
+        warn("Could not render returns data")
+        warn(e)
+        Base.show_backtrace(STDERR, catch_backtrace())
+        pad(1em, "Returns data is not available")
+    end
 
     volatility = try
         layers = Any[
