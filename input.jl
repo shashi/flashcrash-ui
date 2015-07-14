@@ -1,7 +1,6 @@
-import Escher.render
-
-const start_date = Date("2014-02-03")
-const date_range = Date("2014-02-02"):Date("2014-02-05")
+const start_date = Date("2014-06-16")
+const date_range = Date("2014-01-01"):Date("2014-06-30")
+current_stock = "SCHW"
 
 # Input signals
 
@@ -45,8 +44,8 @@ function input_pane(window)
     push!(window.assets, "widgets")
 
     current_date = Input(start_date)
-    current_ticker = Input("A")
-    search_string = Input("A")
+    current_ticker = Input(current_stock)
+    search_string = Input(current_stock)
     selection_stream = Input{Any}((nothing, nothing))
     selected_categories = foldl(update_selection, Set(String[]), selection_stream)
 
