@@ -1,5 +1,8 @@
 const datadir = joinpath(dirname(@__FILE__), "xdata", "splitup")
 const gpx = Gadfly.px
+
+include("analysis.jl")
+
 function output_pane(ticker, date)
 
     dir = joinpath(datadir, Dates.format(date, "yyyymmdd"), "1", "e" * ticker)
