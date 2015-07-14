@@ -55,7 +55,7 @@ function output_pane(ticker, date)
         Base.show_backtrace(STDERR, catch_backtrace())
     end
 
-    if ret_gesd==nothing && returns!=nothing
+    if (ret_gesd==nothing || !haskey(ret_gesd, :vol)) && returns!=nothing
         info("Detecting outliers in returns")
         returns, returnsidx2pricesidx=ret(tpv)
         is, Gs, Gth = gesd(returns[:returns], 20, 1e-10)
